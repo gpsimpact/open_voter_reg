@@ -1,0 +1,12 @@
+run.config:
+  engine: nodejs
+  engine.config:
+    runtime: nodejs-8.9
+  extra_packages:
+    - GraphicsMagick
+    - roboto-fonts
+  fs_watch: true
+
+# add a postgres database
+data.db:
+  image: nanobox/postgresql:9.6
