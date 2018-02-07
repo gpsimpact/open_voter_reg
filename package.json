@@ -7,6 +7,8 @@
   "scripts": {
     "dev": "backpack",
     "build": "backpack build",
+    "db:migrate": "knex-migrate up --knexfile ./src/db/knexfile.js --migrations ./src/db/migrations/",
+    "db:reset": "knex-migrate redo --knexfile ./src/db/knexfile.js --migrations ./src/db/migrations/ --verbose",
     "test:lint": "yarn eslint .",
     "test": "NODE_ENV=test jest --coverage --forceExit",
     "test:watch": "NODE_ENV=test && jest --watch --coverage"
@@ -18,7 +20,10 @@
     "compression": "^1.7.1",
     "express": "^4.16.2",
     "graphql": "^0.12.3",
-    "graphql-tools": "^2.20.0"
+    "graphql-tools": "^2.20.0",
+    "knex": "^0.14.2",
+    "knex-migrate": "^1.5.1",
+    "pg": "^7.4.1"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
