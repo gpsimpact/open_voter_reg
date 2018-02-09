@@ -1,7 +1,10 @@
-
-exports.up = function (knex, Promise) {
+exports.up = function(knex, Promise) {
   return knex.schema.createTableIfNotExists('registrants', table => {
-    table.string('hash').defaultTo(knex.raw('uuid_generate_v4()')).notNullable().primary();
+    table
+      .string('hash')
+      .defaultTo(knex.raw('uuid_generate_v4()'))
+      .notNullable()
+      .primary();
     // pre-screen section of federal form
     table.boolean('attest_citizen').defaultTo(false);
     table.boolean('attest_eighteen_plus').defaultTo(false);
@@ -52,9 +55,9 @@ exports.up = function (knex, Promise) {
     // update / creation flags
     table.timestamp('created_at').defaultTo(knex.fn.now());
     table.timestamp('updated_at').defaultTo(knex.fn.now());
-  })
+  });
 };
 
-exports.down = function (knex, Promise) {
-  return knex.raw('DROP TABLE IF EXISTS registrants CASCADE')
+exports.down = function(knex, Promise) {
+  return knex.raw('DROP TABLE IF EXISTS registrants CASCADE');
 };

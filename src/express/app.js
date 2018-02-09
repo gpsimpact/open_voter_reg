@@ -5,6 +5,7 @@ import compression from 'compression';
 import { formatError } from 'apollo-errors';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
 import schema from '../graphql/schema';
+import MakeContext from '../Context';
 
 // APOLLO OPTICS SERVICE - TEMPORARILY DISABLED UNTIL API IS MORE COMPLETE
 // const engine = new Engine({
@@ -31,7 +32,7 @@ app.use(
   graphqlExpress(req => {
     return {
       schema,
-      context: {},
+      context: new MakeContext(req),
       formatError,
       // tracing: true, // for apollo optics
       // cacheControl: true, // for apollo optics
