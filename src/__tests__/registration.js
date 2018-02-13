@@ -3,6 +3,7 @@ import db from '../db';
 import schema from '../graphql/schema';
 import faker from 'faker';
 import MakeContext from '../Context';
+import { find } from 'lodash';
 
 beforeAll(async () => await db.migrate.latest({ directory: './src/db/migrations' }));
 beforeEach(async () => await Promise.all([db.raw('TRUNCATE TABLE registrants CASCADE ')]));
@@ -102,5 +103,82 @@ describe('Registration Updates', () => {
     expect(result.data.updateRegistrant.hash).toEqual(registrantRecord.hash);
     expect(result.data.updateRegistrant.name_last).toEqual(registrantRecord.name_last);
     expect(result.data.updateRegistrant.name_first).toEqual(registrantRecord.name_first);
+  });
+
+  test('registrant update call updates updated timestamp', async () => {
+    // create a registrant record
+    const registrantRecord = {
+      hash: faker.random.uuid(),
+      name_first: faker.name.firstName(),
+      name_last: faker.name.lastName(),
+    };
+    // insert registrant record directly into db
+    const firstDbRecord = await db
+      .table('registrants')
+      .insert(registrantRecord)
+      .returning('*');
+    const new_name_first = 'Testy';
+    const query = `
+      mutation {
+          updateRegistrant(
+            data:{
+              hash: "${registrantRecord.hash}",
+              name_first: "${new_name_first}", 
+            }
+          ) {
+            hash
+            name_first
+            name_last
+          }
+        }
+    `;
+    const rootValue = {};
+    const context = new MakeContext({ user: null });
+    await graphql(schema, query, rootValue, context);
+    const updatedDbRecord = await db
+      .table('registrants')
+      .where({ hash: registrantRecord.hash })
+      .first();
+    expect(updatedDbRecord.updated_at).not.toEqual(firstDbRecord[0].updated_at);
+  });
+
+  test('registrant update call update is blocked if older than 48 hours', async () => {
+    // make an old date
+    const d = new Date();
+    d.setDate(d.getDate() - 5);
+
+    // create a registrant record
+    const registrantRecord = {
+      hash: faker.random.uuid(),
+      name_first: faker.name.firstName(),
+      name_last: faker.name.lastName(),
+      updated_at: d,
+    };
+    // insert registrant record directly into db
+    await db
+      .table('registrants')
+      .insert(registrantRecord)
+      .returning('*');
+    const new_name_first = 'Testy';
+    const query = `
+      mutation {
+          updateRegistrant(
+            data:{
+              hash: "${registrantRecord.hash}",
+              name_first: "${new_name_first}", 
+            }
+          ) {
+            hash
+            name_first
+            name_last
+          }
+        }
+    `;
+    const rootValue = {};
+    const context = new MakeContext({ user: null });
+    const result = await graphql(schema, query, rootValue, context);
+    expect(
+      find(result.errors, { message: 'This record has been locked and can not be updated.' })
+    ).not.toBeUndefined();
   });
 });
