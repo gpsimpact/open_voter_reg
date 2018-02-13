@@ -54,6 +54,8 @@ input RegistrationInput {
   previous_address_state: String
   previous_address_zipcode: String
   helper: String
+  # free form place to record reason for update
+  most_recent_update_tag: String
 }
 
 type RegistrantProfile {
@@ -96,6 +98,8 @@ type RegistrantProfile {
   previous_address_state: String
   previous_address_zipcode: String
   helper: String
+  # optional label for most recent mutation
+  most_recent_update_tag: String
 }
 
 type Mutation {

@@ -52,6 +52,8 @@ exports.up = function(knex, Promise) {
     table.string('previous_address_zipcode');
     // section D of federal form
     table.string('helper');
+    // place to record last updated step
+    table.string('most_recent_update_label');
     // update / creation flags
     table.timestamp('created_at').defaultTo(knex.fn.now());
     table.timestamp('updated_at').defaultTo(knex.fn.now());
