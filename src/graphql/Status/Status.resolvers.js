@@ -1,5 +1,5 @@
 export default {
-  Status: {
-    message: obj => obj.msg,
+  status: {
+    message: root => root.msg,
   },
 };
