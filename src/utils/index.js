@@ -1,3 +1,5 @@
+import faker from 'faker';
+
 export function mapTo(keys, keyFn) {
   return rows => {
     const group = new Map(keys.map(key => [key, null]));
@@ -21,3 +23,19 @@ export function mapToValues(keys, keyFn, valueFn) {
     return Array.from(group.values());
   };
 }
+
+export const generateFakeUsers = (num, seed) => {
+  faker.seed(seed); // ensures consistent result
+  const fakeUsers = [];
+  Array(num)
+    .fill()
+    .map((_, i) => {
+      fakeUsers.push({
+        first_name: faker.name.firstName(),
+        last_name: faker.name.lastName(),
+        email: faker.internet.email(),
+        password: faker.internet.password(),
+      });
+    });
+  return fakeUsers;
+};

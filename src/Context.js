@@ -1,6 +1,8 @@
 import sqlDb from './db';
 import RegistrantConnector from './connectors/registrants';
+import UserConnector from './connectors/users';
 import RegistrantModel from './models/registrants';
+import UserModel from './models/users';
 
 class MakeContext {
   constructor(request) {
@@ -8,10 +10,12 @@ class MakeContext {
 
     this.connectors = {
       registrant: { ...new RegistrantConnector({ sqlDb }) },
+      user: { ...new UserConnector({ sqlDb }) },
     };
 
     this.models = {
       registrant: { ...new RegistrantModel() },
+      user: { ...new UserModel() },
     };
   }
 
