@@ -1,4 +1,4 @@
-exports.up = function(knex, Promise) {
+exports.up = function(knex) {
   return knex.schema.createTableIfNotExists('registrants', table => {
     table
       .string('hash')
@@ -60,6 +60,6 @@ exports.up = function(knex, Promise) {
   });
 };
 
-exports.down = function(knex, Promise) {
+exports.down = function(knex) {
   return knex.raw('DROP TABLE IF EXISTS registrants CASCADE');
 };

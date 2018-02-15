@@ -7,3 +7,7 @@ export const RecordLockedError = createError('RecordLockedError', {
 export const DuplicateRegistrationError = createError('DuplicateRegistrationError', {
   message: 'This email address is already associated with an account.',
 });
+
+export const AuthError = createError('AuthError', {
+  message: 'User can not be authenticated.',
+});

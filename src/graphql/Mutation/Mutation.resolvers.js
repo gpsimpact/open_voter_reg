@@ -6,5 +6,8 @@ export default {
     registerUser(root, args, ctx) {
       return ctx.models.user.register(args.user, ctx);
     },
+    login(root, args, ctx) {
+      return ctx.models.user.login(args, ctx);
+    },
   },
 };

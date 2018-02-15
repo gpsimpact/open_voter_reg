@@ -122,7 +122,13 @@ type UserProfile {
   emailVerified: Boolean
 }
 
+type LoginResult {
+  userProfile: UserProfile
+  token: String
+}
+
 type Mutation {
   updateRegistrant(data: RegistrationInput): RegistrantProfile
   registerUser(user: RegisterUserInput): UserProfile!
+  login(email: String!, password: String!): LoginResult
 }
