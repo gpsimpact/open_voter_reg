@@ -1,7 +1,13 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { map, has } from 'lodash';
-import { DuplicateRegistrationError, AuthError, NoValidUserError } from '../errors';
+import buildEmail from '../email';
+import {
+  DuplicateRegistrationError,
+  AuthError,
+  NoValidUserError,
+  InvalidTokenError,
+} from '../errors';
 
 class UserModel {
   register = async ({ email, password, first_name, last_name }, ctx) => {
@@ -18,6 +24,7 @@ class UserModel {
       first_name,
       last_name,
       password: hash,
+      email_verified: false,
     });
 
     return await ctx.connectors.user.userByEmail
@@ -84,6 +91,36 @@ class UserModel {
     ctx.connectors.user.userByEmail.clear(ctx.user.email).prime(ctx.user.email, update[0]);
 
     return 'ok';
+  };
+
+  sendVerificationEmail = ({ email, base_url }, ctx) => {
+    const emailVerificationToken = jwt.sign({ email }, process.env.JWT_SECRET);
+    const content = buildEmail('verifyEmail', { emailVerificationToken, base_url });
+    const messageData = {
+      from: process.env.MAILGUN_EMAIL_SENDER,
+      to: email,
+      subject: content.subject,
+      html: content.html,
+      txt: content.txt,
+    };
+    ctx.connectors.sendEmail(messageData).catch(err => console.log(err));
+    return 'ok';
+  };
+
+  verifyEmailToken = async ({ token }, ctx) => {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const update = await ctx.connectors.user.updateUserByEmail(decoded.email, {
+        email_verified: true,
+      });
+
+      // is this necessary to prime the dataloader here?
+      await ctx.connectors.user.userByEmail.clear(decoded.email).prime(decoded.email, update[0]);
+
+      return 'ok';
+    } catch (err) {
+      throw new InvalidTokenError();
+    }
   };
 }
 

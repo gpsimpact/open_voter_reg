@@ -25,8 +25,10 @@
     "graphql": "^0.12.3",
     "graphql-tools": "^2.20.0",
     "jsonwebtoken": "^8.1.1",
+    "juice": "^4.2.2",
     "knex": "^0.14.2",
     "knex-migrate": "^1.5.1",
+    "mailgun-js": "^0.16.0",
     "pg": "^7.4.1"
   },
   "devDependencies": {

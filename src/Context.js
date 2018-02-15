@@ -2,6 +2,7 @@ import sqlDb from './db';
 import RegistrantConnector from './connectors/registrants';
 import UserConnector from './connectors/users';
 import OrganizationPermissionsConnector from './connectors/organizationPermissions';
+import sendEmail from './connectors/email';
 import RegistrantModel from './models/registrants';
 import UserModel from './models/users';
 
@@ -13,6 +14,7 @@ class MakeContext {
       registrant: { ...new RegistrantConnector({ sqlDb }) },
       user: { ...new UserConnector({ sqlDb }) },
       organizationPermissions: { ...new OrganizationPermissionsConnector({ sqlDb }) },
+      sendEmail,
     };
 
     this.models = {

@@ -6,6 +6,7 @@ import { formatError } from 'apollo-errors';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
 import schema from '../graphql/schema';
 import MakeContext from '../Context';
+import buildEmail from '../email';
 
 // APOLLO OPTICS SERVICE - TEMPORARILY DISABLED UNTIL API IS MORE COMPLETE
 // const engine = new Engine({
@@ -26,6 +27,10 @@ const app = express();
 app.use(compression());
 // app.use(engine.expressMiddleware());
 app.get('/status', (req, res) => res.send('Express status: OK')); // todo
+app.get('/email/:topic', (req, res) => {
+  const content = buildEmail(req.params.topic, req.query);
+  res.send(content.html);
+});
 app.use(
   '/graphql',
   bodyParser.json(),

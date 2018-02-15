@@ -119,7 +119,7 @@ type UserProfile {
   first_name: String
   last_name: String
   email: String!
-  emailVerified: Boolean
+  email_verified: Boolean
 }
 
 type LoginResult {
@@ -139,4 +139,6 @@ type Mutation {
   registerUser(user: RegisterUserInput): UserProfile!
   login(email: String!, password: String!): LoginResult
   changePassword(data:ChangePasswordInput): String!
+  sendVerificationEmail(email: String!, base_url: String!): String!
+  verifyEmailAddress(token: String!): String!
 }

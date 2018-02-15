@@ -15,3 +15,7 @@ export const AuthError = createError('AuthError', {
 export const NoValidUserError = createError('NoValidUserError', {
   message: 'No valid user found. Can not complete request.',
 });
+
+export const InvalidTokenError = createError('InavlidTokenError', {
+  message: 'Invalid Token.',
+});
