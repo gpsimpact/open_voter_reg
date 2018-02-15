@@ -127,8 +127,16 @@ type LoginResult {
   token: String
 }
 
+input ChangePasswordInput {
+  # existing password
+  currentPassword: String!
+  # new password
+  newPassword: String!
+}
+
 type Mutation {
   updateRegistrant(data: RegistrationInput): RegistrantProfile
   registerUser(user: RegisterUserInput): UserProfile!
   login(email: String!, password: String!): LoginResult
+  changePassword(data:ChangePasswordInput): String!
 }

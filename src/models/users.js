@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { map, has } from 'lodash';
-import { DuplicateRegistrationError, AuthError } from '../errors';
+import { DuplicateRegistrationError, AuthError, NoValidUserError } from '../errors';
 
 class UserModel {
   register = async ({ email, password, first_name, last_name }, ctx) => {
@@ -41,7 +41,6 @@ class UserModel {
 
     const permsByService = {};
     map(userServicePermissionsRaw, permission => {
-      // permsByService[permission.service_id] = permission.permission;
       if (has(permsByService, permission.service_id)) {
         permsByService[permission.org_hash].push(permission.permission);
       } else {
@@ -58,6 +57,33 @@ class UserModel {
       userProfile: dbUserRecord,
       token,
     };
+  };
+
+  changePassword = async ({ currentPassword, newPassword }, ctx) => {
+    if (!ctx.user || !ctx.user.email) {
+      throw new NoValidUserError();
+    }
+
+    const dbUserRecord = await ctx.connectors.user.userByEmail.load(ctx.user.email);
+
+    // is the user passed via context valid?
+    if (!dbUserRecord) {
+      throw new NoValidUserError();
+    }
+
+    // does current password match one on file?
+    if (!bcrypt.compareSync(currentPassword, dbUserRecord.password)) {
+      throw new AuthError();
+    }
+
+    // all checks clear, go ahead.
+    const hash = bcrypt.hashSync(newPassword, 10);
+    const update = await ctx.connectors.user.updateUserByEmail(ctx.user.email, { password: hash });
+
+    // is this necessary to prime the dataloader here?
+    ctx.connectors.user.userByEmail.clear(ctx.user.email).prime(ctx.user.email, update[0]);
+
+    return 'ok';
   };
 }
 

@@ -19,6 +19,13 @@ class UserConnector {
       .table('users')
       .insert(data)
       .returning('*');
+
+  updateUserByEmail = (email, data) =>
+    this.sqlDb
+      .table('users')
+      .update(data)
+      .where({ email })
+      .returning('*');
 }
 
 export default UserConnector;

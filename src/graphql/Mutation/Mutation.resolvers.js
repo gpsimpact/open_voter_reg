@@ -9,5 +9,8 @@ export default {
     login(root, args, ctx) {
       return ctx.models.user.login(args, ctx);
     },
+    changePassword(root, args, ctx) {
+      return ctx.models.user.changePassword(args.data, ctx);
+    },
   },
 };

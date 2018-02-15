@@ -11,3 +11,7 @@ export const DuplicateRegistrationError = createError('DuplicateRegistrationErro
 export const AuthError = createError('AuthError', {
   message: 'User can not be authenticated.',
 });
+
+export const NoValidUserError = createError('NoValidUserError', {
+  message: 'No valid user found. Can not complete request.',
+});
