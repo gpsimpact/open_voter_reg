@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { map, has } from 'lodash';
+import { map, has, pick } from 'lodash';
 import buildEmail from '../email';
 import {
   DuplicateRegistrationError,
@@ -121,6 +121,65 @@ class UserModel {
     } catch (err) {
       throw new InvalidTokenError();
     }
+  };
+
+  sendPasswordResetEmail = async ({ email, base_url }, ctx) => {
+    const token = jwt.sign({ email }, process.env.JWT_SECRET);
+    const content = buildEmail('resetPassword', { token, base_url });
+    const messageData = {
+      from: process.env.MAILGUN_EMAIL_SENDER,
+      to: email,
+      subject: content.subject,
+      html: content.html,
+      txt: content.txt,
+    };
+    ctx.connectors.sendEmail(messageData).catch(err => console.log(err));
+    return 'ok';
+  };
+
+  resetPassword = async ({ token, newPassword }, ctx) => {
+    let email;
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      email = decoded.email;
+    } catch (err) {
+      throw new InvalidTokenError();
+    }
+
+    const dbUserRecord = await ctx.connectors.user.userByEmail.load(email);
+    if (!dbUserRecord) {
+      throw new NoValidUserError();
+    }
+
+    // all checks clear, go ahead.
+    const hash = bcrypt.hashSync(newPassword, 10);
+
+    const update = await ctx.connectors.user.updateUserByEmail(email, {
+      password: hash,
+    });
+
+    // is this necessary to prime the dataloader here?
+    await ctx.connectors.user.userByEmail.clear(email).prime(email, update[0]);
+
+    return 'ok';
+  };
+
+  updateProfile = async (data, ctx) => {
+    if (!ctx.user || !ctx.user.email) {
+      throw new NoValidUserError();
+    }
+    // todo. This is hacky. Need to filter out and only allow certain values and if exist transform to db casing
+    const approvedData = pick(data, ['first_name', 'last_name']);
+    const submitData = {};
+    if (has(approvedData, 'first_name')) submitData.first_name = approvedData.first_name;
+    if (has(approvedData, 'last_name')) submitData.last_name = approvedData.last_name;
+
+    const update = await ctx.connectors.user.updateUserByEmail(ctx.user.email, submitData);
+
+    return await ctx.connectors.user.userByEmail
+      .clear(ctx.user.email)
+      .prime(ctx.user.email, update[0])
+      .load(ctx.user.email);
   };
 }
 

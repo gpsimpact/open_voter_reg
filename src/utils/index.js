@@ -1,4 +1,6 @@
 import faker from 'faker';
+import { includes } from 'lodash';
+import { InsufficientPermissionsError } from '../errors';
 
 export function mapTo(keys, keyFn) {
   return rows => {
@@ -38,4 +40,14 @@ export const generateFakeUsers = (num, seed) => {
       });
     });
   return fakeUsers;
+};
+
+export const hasPermission = (viewer, service, requiredPermission, throwOnFail = false) => {
+  if (!includes(viewer.permissions[service], requiredPermission)) {
+    if (throwOnFail) {
+      throw new InsufficientPermissionsError();
+    }
+    return false;
+  }
+  return true;
 };

@@ -18,5 +18,20 @@ export default {
     verifyEmailAddress(root, args, ctx) {
       return ctx.models.user.verifyEmailToken(args, ctx);
     },
+    sendPasswordResetEmail(root, args, ctx) {
+      return ctx.models.user.sendPasswordResetEmail(args, ctx);
+    },
+    resetPassword(root, args, ctx) {
+      return ctx.models.user.resetPassword(args.data, ctx);
+    },
+    updateProfile(root, args, ctx) {
+      return ctx.models.user.updateProfile(args.data, ctx);
+    },
+    addOrganizationPermission(root, args, ctx) {
+      return ctx.models.organizationPermissions.addOrganizationPermission(args, ctx);
+    },
+    removeOrganizationPermission(root, args, ctx) {
+      return ctx.models.organizationPermissions.removeOrganizationPermission(args, ctx);
+    },
   },
 };

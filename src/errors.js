@@ -19,3 +19,7 @@ export const NoValidUserError = createError('NoValidUserError', {
 export const InvalidTokenError = createError('InavlidTokenError', {
   message: 'Invalid Token.',
 });
+
+export const InsufficientPermissionsError = createError('InsufficientPermissionsError', {
+  message: 'Insufficient permissions.',
+});

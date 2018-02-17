@@ -134,6 +134,40 @@ input ChangePasswordInput {
   newPassword: String!
 }
 
+input ResetPasswordInput {
+  # email address
+  token: String!
+  # new password
+  newPassword: String!
+}
+
+input UpdateProfileInput {
+  # the User first name
+  first_name: String
+  # the user last name
+  last_name: String
+}
+
+type OrganizationUserPermission {
+  email: String!
+  permissions: [String]
+}
+
+type OrganizationPermissions {
+  organization: Organization!
+  users: [OrganizationUserPermission]
+}
+
+type Organization {
+  hash: String!
+  name: String!
+}
+
+enum PermissionEnum {
+  READ_ONLY
+  ADMIN
+}
+
 type Mutation {
   updateRegistrant(data: RegistrationInput): RegistrantProfile
   registerUser(user: RegisterUserInput): UserProfile!
@@ -141,4 +175,9 @@ type Mutation {
   changePassword(data:ChangePasswordInput): String!
   sendVerificationEmail(email: String!, base_url: String!): String!
   verifyEmailAddress(token: String!): String!
+  sendPasswordResetEmail(email: String!, base_url: String!): String!
+  resetPassword(data: ResetPasswordInput!): String!
+  updateProfile(data: UpdateProfileInput): UserProfile!
+  addOrganizationPermission(organizationHash: String!, permission: PermissionEnum!, userEmail: String!): OrganizationPermissions!
+  removeOrganizationPermission(organizationHash: String!, permission: PermissionEnum!, userEmail: String!): OrganizationPermissions!
 }
